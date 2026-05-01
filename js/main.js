@@ -96,9 +96,9 @@ async function loadDates() {
           <div>
             <div class="event-title">${ev.title || ''}</div>
             <div class="event-meta">
-              ${ev.time     ? `<span>🕐 ${ev.time}</span>` : ''}
-              ${ev.format   ? `<span>📡 ${ev.format}</span>` : ''}
-              ${ev.location ? `<span>📍 ${ev.location}</span>` : ''}
+              ${ev.time     ? `<span>${ev.time}</span>` : ''}
+              ${ev.format   ? `<span>${ev.format}</span>` : ''}
+              ${ev.location ? `<span>${ev.location}</span>` : ''}
             </div>
             <p class="event-desc">${ev.description || ''}</p>
             ${ev.price ? `<div class="event-price">${ev.price}</div>` : ''}
