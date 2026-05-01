@@ -1,0 +1,102 @@
+# Decap CMS Configuration
+# Documentation: https://decapcms.org/docs/configuration-options/
+
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/anne-partridge   # ← Replace with your GitHub repo
+  branch: main
+  base_url: https://YOUR_DOMAIN.vercel.app    # ← Replace with your Vercel URL
+  auth_endpoint: api/auth
+
+# Where uploaded images are stored
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+# French locale
+locale: fr
+
+collections:
+
+  # ── UPCOMING DATES ───────────────────────────���─────
+  - name: "prochaines_dates"
+    label: "📅 Prochaines Dates"
+    files:
+      - name: "events"
+        label: "Liste des événements"
+        file: "content/prochaines-dates.json"
+        fields:
+          - label: "Événements"
+            name: "events"
+            widget: "list"
+            summary: "{{fields.title}} — {{fields.date}}"
+            fields:
+              - label: "Titre de l'événement"
+                name: "title"
+                widget: "string"
+                hint: "Ex: Frères et Sœurs sans Rivalité — Groupe du Mardi"
+
+              - label: "Date (format AAAA-MM-JJ)"
+                name: "date"
+                widget: "string"
+                hint: "Ex: 2026-05-12"
+
+              - label: "Heure"
+                name: "time"
+                widget: "string"
+                required: false
+                hint: "Ex: 15h00–17h00"
+
+              - label: "Format"
+                name: "format"
+                widget: "select"
+                required: false
+                options:
+                  - { label: "En ligne (visio)", value: "En ligne (visio)" }
+                  - { label: "Présentiel", value: "Présentiel" }
+                  - { label: "Présentiel + Visio", value: "Présentiel + Visio" }
+
+              - label: "Lieu (présentiel)"
+                name: "location"
+                widget: "string"
+                required: false
+                hint: "Laisser vide si en ligne"
+
+              - label: "Description"
+                name: "description"
+                widget: "text"
+                hint: "Détails : nombre de séances, dates, etc."
+
+              - label: "Tarif"
+                name: "price"
+                widget: "string"
+                required: false
+                hint: "Ex: 210 € / personne — cahier inclus"
+
+              - label: "Lien d'inscription"
+                name: "registration"
+                widget: "string"
+                required: false
+                hint: "URL Billetweb ou mailto:parlecouter@gmail.com"
+
+  # ── TESTIMONIALS ───────────────────────────────────
+  - name: "temoignages"
+    label: "💬 Témoignages"
+    files:
+      - name: "testimonials"
+        label: "Liste des témoignages"
+        file: "content/temoignages.json"
+        fields:
+          - label: "Témoignages"
+            name: "testimonials"
+            widget: "list"
+            summary: "{{fields.author}} — {{fields.text}}"
+            fields:
+              - label: "Texte du témoignage"
+                name: "text"
+                widget: "text"
+
+              - label: "Auteur (optionnel)"
+                name: "author"
+                widget: "string"
+                required: false
+                hint: "Ex: Marie, maman de 2 enfants — laisser vide pour anonyme"
