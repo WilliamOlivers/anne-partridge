@@ -3,18 +3,18 @@
    =================================================== */
 
 :root {
-  --primary:       #1D3461;
-  --primary-light: #2B4B8A;
+  --primary:       #748B44;
+  --primary-light: #8DA053;
   --accent:        #C9A820;
   --accent-dark:   #A88A14;
   --bg:            #FFFFFF;
-  --bg-alt:        #F4F6FA;
-  --text:          #1A1F2E;
-  --text-light:    #6B7280;
+  --bg-alt:        #F6F7F2;
+  --text:          #1A1F0E;
+  --text-light:    #6B7260;
   --white:         #FFFFFF;
-  --border:        #DDE1EC;
-  --shadow:        0 2px 12px rgba(29, 52, 97, 0.08);
-  --shadow-lg:     0 8px 28px rgba(29, 52, 97, 0.14);
+  --border:        #DDE1D4;
+  --shadow:        0 2px 12px rgba(116, 139, 68, 0.10);
+  --shadow-lg:     0 8px 28px rgba(116, 139, 68, 0.16);
   --radius:        8px;
   --radius-lg:     16px;
   --font-h:        'Cormorant Garamond', 'Playfair Display', Georgia, serif;
