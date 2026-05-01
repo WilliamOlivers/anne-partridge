@@ -3,9 +3,9 @@
 
 backend:
   name: github
-  repo: YOUR_GITHUB_USERNAME/anne-partridge   # ← Replace with your GitHub repo
+  repo: WilliamOlivers/anne-partridge   # ← Replace with your GitHub repo
   branch: main
-  base_url: https://YOUR_DOMAIN.vercel.app    # ← Replace with your Vercel URL
+  base_url: https://anne-partridge.vercel.app    # ← Replace with your Vercel URL
   auth_endpoint: api/auth
 
 # Where uploaded images are stored
