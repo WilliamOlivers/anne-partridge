@@ -7,7 +7,90 @@
   <title>Administration — Anne Partridge</title>
 </head>
 <body>
-  <!-- Decap CMS — https://decapcms.org/ -->
+  <script>
+    // Tell Decap CMS we will init manually (avoids loading config.yml)
+    CMS_MANUAL_INIT = true;
+  </script>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    CMS.init({
+      config: {
+        backend: {
+          name: 'github',
+          repo: 'WilliamOlivers/anne-partridge',
+          branch: 'main',
+          base_url: 'https://anne-partridge.vercel.app',
+          auth_endpoint: 'api/auth',
+        },
+        media_folder: 'images/uploads',
+        public_folder: '/images/uploads',
+        locale: 'fr',
+        collections: [
+          {
+            name: 'prochaines_dates',
+            label: '📅 Prochaines Dates',
+            files: [
+              {
+                name: 'events',
+                label: 'Liste des événements',
+                file: 'content/prochaines-dates.json',
+                fields: [
+                  {
+                    label: 'Événements',
+                    name: 'events',
+                    widget: 'list',
+                    summary: '{{fields.title}} — {{fields.date}}',
+                    fields: [
+                      { label: "Titre de l'événement", name: 'title', widget: 'string' },
+                      { label: 'Date (AAAA-MM-JJ)', name: 'date', widget: 'string', hint: 'Ex: 2026-06-10' },
+                      { label: 'Heure', name: 'time', widget: 'string', required: false, hint: 'Ex: 15h00–17h00' },
+                      {
+                        label: 'Format',
+                        name: 'format',
+                        widget: 'select',
+                        required: false,
+                        options: [
+                          { label: 'En ligne (visio)', value: 'En ligne (visio)' },
+                          { label: 'Présentiel', value: 'Présentiel' },
+                          { label: 'Présentiel + Visio', value: 'Présentiel + Visio' },
+                        ],
+                      },
+                      { label: 'Lieu (présentiel)', name: 'location', widget: 'string', required: false, hint: 'Laisser vide si en ligne' },
+                      { label: 'Description', name: 'description', widget: 'text' },
+                      { label: 'Tarif', name: 'price', widget: 'string', required: false, hint: 'Ex: 210 € / personne' },
+                      { label: "Lien d'inscription", name: 'registration', widget: 'string', required: false, hint: 'URL ou mailto:parlecouter@gmail.com' },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: 'temoignages',
+            label: '💬 Témoignages',
+            files: [
+              {
+                name: 'testimonials',
+                label: 'Liste des témoignages',
+                file: 'content/temoignages.json',
+                fields: [
+                  {
+                    label: 'Témoignages',
+                    name: 'testimonials',
+                    widget: 'list',
+                    summary: '{{fields.author}} — {{fields.text}}',
+                    fields: [
+                      { label: 'Texte du témoignage', name: 'text', widget: 'text' },
+                      { label: 'Auteur (optionnel)', name: 'author', widget: 'string', required: false, hint: 'Ex: Marie, maman de 2 enfants — laisser vide pour anonyme' },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
+  </script>
 </body>
 </html>
