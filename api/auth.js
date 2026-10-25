@@ -2,7 +2,7 @@
 // Step 1 (no code): redirect to GitHub authorization page (with anti-CSRF state)
 // Step 2 (with code): verify state, exchange code for token, post back to CMS window
 
-import { randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
 // Fixed scope: the repo is public, so write access to public repos is enough.
 // Never taken from the query string.
@@ -65,17 +65,21 @@ export default async function handler(req, res) {
     const message = JSON.stringify('authorization:github:success:' + payload);
 
     res.setHeader('Set-Cookie', clear);
-    res.setHeader('Content-Type', 'text/html');
-    res.send(buildPopupHtml(message, origin));
+    sendPopup(res, 200, buildPopupHtml(message, origin));
 
   } catch (err) {
     const payload = JSON.stringify({ error: String(err.message) });
     const message = JSON.stringify('authorization:github:error:' + payload);
 
     res.setHeader('Set-Cookie', clear);
-    res.setHeader('Content-Type', 'text/html');
-    res.status(500).send(buildPopupHtml(message, origin));
+    sendPopup(res, 500, buildPopupHtml(message, origin));
   }
+}
+
+function sendPopup(res, status, { html, csp }) {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Content-Security-Policy', csp);
+  res.status(status).send(html);
 }
 
 function cookie(name, value, maxAge, isLocal) {
@@ -102,10 +106,7 @@ function jsLiteral(s) {
 }
 
 function buildPopupHtml(message, origin) {
-  return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
-<body>
-<script>
+  const script = `
 (function () {
   const msg = ${jsLiteral(message)};
   const allowedOrigin = ${jsLiteral(JSON.stringify(origin))};
@@ -119,6 +120,12 @@ function buildPopupHtml(message, origin) {
   // Handshake carries no secret; target the CMS origin only.
   window.opener.postMessage('authorizing:github', allowedOrigin);
 })();
-</script>
-</body></html>`;
+`;
+  // Allow only this exact inline script (the site-wide CSP does not cover /api/)
+  const hash = createHash('sha256').update(script).digest('base64');
+  return { html: `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body>
+<script>${script}</script>
+</body></html>`, csp: `default-src 'none'; script-src 'sha256-${hash}'` };
 }
