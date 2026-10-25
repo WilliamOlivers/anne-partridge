@@ -1,0 +1,64 @@
+/* Visual editor — only loaded in edit mode */
+body.ap-editing { padding-bottom: 76px; }
+
+[data-ap-text] { outline: 2px dashed transparent; outline-offset: 3px; cursor: text; transition: outline-color .15s; }
+[data-ap-text]:hover { outline-color: rgba(116, 139, 68, .6); }
+[data-ap-text]:focus { outline: 2px solid var(--primary); background: rgba(116, 139, 68, .06); }
+[data-ap-text]:empty { min-height: 1.2em; min-width: 3em; display: block; }
+[data-ap-img] { outline: 2px dashed transparent; outline-offset: 3px; cursor: pointer; transition: outline-color .15s; }
+[data-ap-img]:hover { outline-color: rgba(116, 139, 68, .8); }
+
+#ap-editor-ui, #ap-editor-ui * { font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif; box-sizing: border-box; }
+#ap-editor-ui button, #ap-login button {
+  border: 1px solid #DDE1D4; background: #fff; color: #1A1F0E; border-radius: 6px;
+  padding: .45rem .9rem; font-size: .9rem; cursor: pointer;
+}
+#ap-editor-ui button:hover, #ap-login button:hover { background: #F6F7F2; }
+#ap-editor-ui button:disabled, #ap-login button:disabled { opacity: .5; cursor: default; }
+#ap-editor-ui .ap-primary, #ap-login .ap-primary { background: #748B44; border-color: #748B44; color: #fff; font-weight: 700; }
+#ap-editor-ui .ap-primary:hover, #ap-login .ap-primary:hover { background: #8DA053; }
+
+.ap-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 9990;
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  padding: .7rem 1rem; background: #fff; border-top: 1px solid #DDE1D4;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, .08);
+}
+.ap-title { font-weight: 700; color: #748B44; }
+.ap-hint { flex: 1; color: #6B7260; font-size: .85rem; }
+
+.ap-toolbar {
+  position: absolute; z-index: 9991; display: none; gap: .25rem; padding: .3rem;
+  background: #1A1F0E; border-radius: 8px; box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+}
+#ap-editor-ui .ap-toolbar button { background: transparent; border: 0; color: #fff; padding: .3rem .6rem; }
+#ap-editor-ui .ap-toolbar button:hover { background: rgba(255, 255, 255, .18); }
+
+.ap-panel {
+  position: fixed; right: 1rem; bottom: 70px; z-index: 9992; width: 280px;
+  display: flex; flex-direction: column; gap: .5rem; padding: 1rem;
+  background: #fff; border: 1px solid #DDE1D4; border-radius: 10px; box-shadow: 0 8px 28px rgba(0, 0, 0, .15);
+}
+.ap-panel[hidden] { display: none; }
+.ap-panel label { display: flex; align-items: center; gap: .6rem; font-size: .9rem; }
+.ap-panel input[type=color] { width: 38px; height: 28px; padding: 0; border: 1px solid #DDE1D4; border-radius: 4px; background: none; }
+
+.ap-toast {
+  position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%); z-index: 9999;
+  max-width: 90vw; padding: .7rem 1.2rem; border-radius: 8px; color: #fff; background: #748B44;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.ap-toast.err { background: #B3261E; }
+.ap-toast.show { opacity: 1; }
+
+#ap-login {
+  position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;
+  background: rgba(26, 31, 14, .55);
+}
+.ap-login-card {
+  display: flex; flex-direction: column; gap: .8rem; width: min(92vw, 380px); padding: 2rem;
+  background: #fff; border-radius: 12px; text-align: center;
+}
+.ap-login-card h2 { margin: 0; }
+.ap-login-card p { margin: 0; }
+.ap-err { color: #B3261E; min-height: 1em; font-size: .9rem; }

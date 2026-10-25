@@ -188,9 +188,19 @@ function initContactForm() {
   });
 }
 
+/* ----- Visual editor (admin only): loaded on demand, never for visitors ----- */
+function maybeStartEditor() {
+  let on = false;
+  try {
+    if (new URLSearchParams(location.search).has('edit')) sessionStorage.setItem('ap_edit', '1');
+    on = sessionStorage.getItem('ap_edit') === '1';
+  } catch {}
+  if (on) import('/js/editor.js').then(m => m.initEditor());
+}
+
 /* ----- Init ----- */
 document.addEventListener('DOMContentLoaded', () => {
-  loadPartials();
+  loadPartials().then(maybeStartEditor);
   loadDates();
   loadTestimonials();
   initContactForm();
