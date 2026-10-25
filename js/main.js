@@ -68,6 +68,23 @@ function setActiveNav() {
   }
 }
 
+/* ----- Safety helpers: CMS content is untrusted, never inject it raw ----- */
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+// Only allow https:, http: and mailto: links (blocks javascript:, data:, ...)
+function safeUrl(url) {
+  try {
+    const u = new URL(String(url).trim(), window.location.origin);
+    return ['https:', 'http:', 'mailto:'].includes(u.protocol) ? u.href : '';
+  } catch {
+    return '';
+  }
+}
+
 /* ----- Load upcoming dates ----- */
 async function loadDates() {
   const el = document.getElementById('dates-container');
@@ -87,22 +104,24 @@ async function loadDates() {
       const day   = d ? d.getDate() : '—';
       const month = d ? d.toLocaleDateString('fr-FR', { month: 'short' }).toUpperCase() : '';
 
+      const registration = ev.registration ? safeUrl(ev.registration) : '';
+
       return `
         <div class="event-card">
           <div class="event-badge">
-            <div class="day">${day}</div>
-            <div class="month">${month}</div>
+            <div class="day">${esc(day)}</div>
+            <div class="month">${esc(month)}</div>
           </div>
           <div>
-            <div class="event-title">${ev.title || ''}</div>
+            <div class="event-title">${esc(ev.title)}</div>
             <div class="event-meta">
-              ${ev.time     ? `<span>${ev.time}</span>` : ''}
-              ${ev.format   ? `<span>${ev.format}</span>` : ''}
-              ${ev.location ? `<span>${ev.location}</span>` : ''}
+              ${ev.time     ? `<span>${esc(ev.time)}</span>` : ''}
+              ${ev.format   ? `<span>${esc(ev.format)}</span>` : ''}
+              ${ev.location ? `<span>${esc(ev.location)}</span>` : ''}
             </div>
-            <p class="event-desc">${ev.description || ''}</p>
-            ${ev.price ? `<div class="event-price">${ev.price}</div>` : ''}
-            ${ev.registration ? `<div style="margin-top:.9rem"><a href="${ev.registration}" class="btn btn-primary btn-sm">Inscription</a></div>` : ''}
+            <p class="event-desc">${esc(ev.description)}</p>
+            ${ev.price ? `<div class="event-price">${esc(ev.price)}</div>` : ''}
+            ${registration ? `<div style="margin-top:.9rem"><a href="${esc(registration)}" class="btn btn-primary btn-sm">Inscription</a></div>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -123,8 +142,8 @@ async function loadTestimonials() {
     el.innerHTML = '<div class="testimonials-grid">' +
       data.testimonials.map(t => `
         <div class="t-card">
-          <p class="t-text">${t.text}</p>
-          ${t.author ? `<p class="t-author">— ${t.author}</p>` : ''}
+          <p class="t-text">${esc(t.text)}</p>
+          ${t.author ? `<p class="t-author">— ${esc(t.author)}</p>` : ''}
         </div>`).join('') +
       '</div>';
   } catch (e) {
