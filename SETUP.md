@@ -4,7 +4,7 @@
 
 Un site statique HTML/CSS complet avec :
 - 16 pages HTML
-- Panneau d'administration Decap CMS (`/admin`) pour qu'Anne puisse éditer elle-même
+- Éditeur visuel (`/admin`) : Anne clique sur les textes et photos du site pour les modifier
 - Hébergement Vercel (gratuit)
 
 ---
@@ -52,13 +52,12 @@ C'est ce qui permet à Anne de se connecter au panneau d'administration.
 
 ---
 
-## Étape 4 — Mettre à jour la config CMS
+## Étape 4 — Vérifier le dépôt de l'éditeur
 
-Dans `admin/config.yml`, remplacez :
+Dans `js/editor.js` (constantes `REPO` et `BRANCH`), vérifiez :
 
-```yaml
-repo: YOUR_GITHUB_USERNAME/anne-partridge   # ← votre nom d'utilisateur GitHub
-base_url: https://YOUR_DOMAIN.vercel.app    # ← votre URL Vercel
+```js
+const REPO = 'VOTRE_USERNAME/anne-partridge';
 ```
 
 Puis faites un `git commit` + `git push`.
@@ -87,11 +86,9 @@ Dans Vercel (Settings > Domains), ajoutez `anne-partridge.com` et suivez les ins
 ## Comment Anne édite son site
 
 1. Elle va sur `https://votre-domaine.vercel.app/admin`
-2. Elle clique **Login with GitHub** (elle doit avoir un compte GitHub)
-3. Elle voit deux sections :
-   - **📅 Prochaines Dates** → ajouter/modifier/supprimer des événements
-   - **💬 Témoignages** → ajouter/modifier/supprimer des témoignages
-4. Après avoir sauvegardé, le site se met à jour automatiquement en ~1 minute
+2. Elle choisit une page ; à la première fois, elle clique **Se connecter avec GitHub** (compte GitHub requis)
+3. Elle clique sur un texte ou une photo pour le modifier (bouton « Couleurs » pour le style, « Modifier les dates / témoignages » sur ces deux pages)
+4. Après avoir cliqué sur **Publier**, le site se met à jour automatiquement en ~1 minute
 
 > **Note** : Anne a besoin d'un compte GitHub et d'y être invitée comme collaboratrice du dépôt.
 > Dans GitHub : Settings > Collaborators > Add people → entrez son nom d'utilisateur.
@@ -124,11 +121,10 @@ anne-partridge/
 │   ├── nav.html                  ← Navigation partagée
 │   └── footer.html               ← Pied de page partagé
 ├── content/
-│   ├── prochaines-dates.json     ← Éditable par Anne via /admin
-│   └── temoignages.json          ← Éditable par Anne via /admin
+│   ├── prochaines-dates.json     ← Éditable via /admin
+│   └── temoignages.json          ← Éditable via /admin
 ├── admin/
-│   ├── index.html                ← Panneau d'administration
-│   └── config.yml                ← Configuration CMS
+│   └── index.html                ← Page d'entrée de l'éditeur visuel (js/editor.js)
 ├── api/
 │   └── auth.js                   ← Authentification GitHub OAuth
 └── vercel.json                   ← Configuration Vercel

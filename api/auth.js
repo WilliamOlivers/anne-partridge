@@ -1,4 +1,4 @@
-// GitHub OAuth handler for Decap CMS
+// GitHub OAuth handler for the visual editor (js/editor.js)
 // Step 1 (no code): redirect to GitHub authorization page (with anti-CSRF state)
 // Step 2 (with code): verify state, exchange code for token, post back to CMS window
 

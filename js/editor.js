@@ -12,7 +12,7 @@ const TOKEN_KEY = 'ap_token';
 const EDIT_KEY  = 'ap_edit';
 
 // Editable text blocks (leaf-most match wins) and zones that are never editable
-const TEXT_SEL = 'h1,h2,h3,h4,h5,p,li,blockquote,figcaption,.workshop-lead,.card-meta,a.btn,a.card-link';
+const TEXT_SEL = 'h1,h2,h3,h4,h5,p,li,blockquote,figcaption,.workshop-lead,.card-meta,a.btn,a.card-link,.price-num,.tag,.contact-info-item span,.contact-info-item a';
 const SKIP_SEL = '#nav-placeholder,#footer-placeholder,#dates-container,#testimonials-container,#ap-editor-ui';
 
 const COLORS = [
@@ -26,6 +26,32 @@ const COLORS = [
   ['border',        'Bordures'],
 ];
 
+// Pages whose content lives in a JSON list (rendered by main.js): edited in a form
+const DATA = {
+  'temoignages.html': {
+    file: 'content/temoignages.json', key: 'testimonials', button: 'Modifier les témoignages', title: 'Témoignages',
+    summary: it => it.author || (it.text || '').slice(0, 40),
+    fields: [
+      { name: 'text',   label: 'Témoignage',          type: 'textarea' },
+      { name: 'author', label: 'Auteur (optionnel)',  type: 'text', hint: 'Ex : Marie, maman de 2 enfants' },
+    ],
+  },
+  'prochaines-dates.html': {
+    file: 'content/prochaines-dates.json', key: 'events', button: 'Modifier les dates', title: 'Prochaines dates',
+    summary: it => `${it.date || ''} ${it.title || ''}`.trim(),
+    fields: [
+      { name: 'title',        label: "Titre de l'événement", type: 'text' },
+      { name: 'date',         label: 'Date',                 type: 'date' },
+      { name: 'time',         label: 'Heure',                type: 'text', hint: 'Ex : 15h00–17h00' },
+      { name: 'format',       label: 'Format',               type: 'select', options: ['', 'En ligne (visio)', 'Présentiel', 'Présentiel + Visio'] },
+      { name: 'location',     label: 'Lieu (présentiel)',    type: 'text' },
+      { name: 'description',  label: 'Description',          type: 'textarea' },
+      { name: 'price',        label: 'Tarif',                type: 'text' },
+      { name: 'registration', label: "Lien d'inscription",   type: 'text', hint: 'https://… ou mailto:parlecouter@gmail.com' },
+    ],
+  },
+};
+
 const norm = s => s.replace(/\s+/g, ' ').trim();
 
 /* ----- State ----- */
@@ -37,6 +63,9 @@ let baseColors = {};
 let ui = {};
 let current = null;      // element the toolbar is attached to
 let leaving = false;
+let dataCfg = null;      // DATA entry for this page, if any
+let dataDoc = null;      // parsed JSON being edited
+let dataBase = '';       // JSON.stringify(dataDoc) as last published
 
 /* ----- Tiny helpers ----- */
 function store(fn) { try { return fn(sessionStorage); } catch { return null; } }
@@ -178,6 +207,7 @@ async function checkAccess() {
    Editing
    =================================================== */
 function setupEditing() {
+  dataCfg = DATA[pagePath()] || null;
   const c = collect(document);
 
   texts = c.texts.map(el => ({ el, html: cleanChildren(el), text: norm(el.textContent) }));
@@ -221,8 +251,9 @@ function setupEditing() {
 function textChanged(t) { return cleanChildren(t.el) !== t.html; }
 function colorsChanged() { return COLORS.filter(([n]) => colors[n] !== baseColors[n]); }
 function hasChanges() {
-  return texts.some(t => textChanged(t) || t.hrefChanged) || imgs.some(i => i.upload || (i.el.getAttribute('alt') || '') !== i.alt) || colorsChanged().length > 0;
+  return texts.some(t => textChanged(t) || t.hrefChanged) || imgs.some(i => i.upload || (i.el.getAttribute('alt') || '') !== i.alt) || colorsChanged().length > 0 || dataChanged();
 }
+function dataChanged() { return !!dataDoc && JSON.stringify(dataDoc) !== dataBase; }
 function markDirty() { ui.publish.disabled = !hasChanges(); }
 
 /* ----- Floating toolbar ----- */
@@ -369,9 +400,14 @@ async function publish() {
       files.push({ path: 'css/style.css', content: css, encoding: 'utf-8' });
     }
 
+    // 3. JSON lists (dates / témoignages)
+    if (dataChanged()) {
+      files.push({ path: dataCfg.file, content: JSON.stringify(dataDoc, null, 2) + '\n', encoding: 'utf-8' });
+    }
+
     if (!files.length) throw new Error('Aucune modification à publier.');
 
-    // 3. One commit for everything
+    // 4. One commit for everything
     const ref    = await gh(`/repos/${REPO}/git/ref/heads/${BRANCH}`);
     const commit = await gh(`/repos/${REPO}/git/commits/${ref.object.sha}`);
     const tree = [];
@@ -384,10 +420,11 @@ async function publish() {
     const newCommit = await gh(`/repos/${REPO}/git/commits`, { method: 'POST', body: JSON.stringify({ message: msg, tree: newTree.sha, parents: [ref.object.sha] }) });
     await gh(`/repos/${REPO}/git/refs/heads/${BRANCH}`, { method: 'PATCH', body: JSON.stringify({ sha: newCommit.sha }) });
 
-    // 4. What is on screen is now the new baseline
+    // 5. What is on screen is now the new baseline
     texts.forEach(t => { t.html = cleanChildren(t.el); t.text = norm(t.el.textContent); t.hrefChanged = false; });
     imgs.forEach(m => { if (m.upload) m.src = '/' + m.upload.path; m.alt = m.el.getAttribute('alt') || ''; m.upload = null; });
     baseColors = { ...colors };
+    if (dataDoc) dataBase = JSON.stringify(dataDoc);
     toast('Publié. Le site sera à jour dans environ 1 minute.');
   } catch (e) {
     toast(e.message, 'err');
@@ -427,6 +464,7 @@ function buildUI() {
   const bar = h('div', { class: 'ap-bar' },
     h('span', { class: 'ap-title' }, 'Mode édition'),
     h('span', { class: 'ap-hint' }, 'Cliquez sur un texte ou une photo pour la modifier'),
+    ...(dataCfg ? [h('button', { type: 'button', onclick: openData }, dataCfg.button)] : []),
     h('button', { type: 'button', onclick: () => { ui.panel.hidden = !ui.panel.hidden; } }, 'Couleurs'),
     ui.publish,
     h('button', { type: 'button', onclick: quit }, 'Quitter'));
@@ -434,6 +472,80 @@ function buildUI() {
   const root = h('div', { id: 'ap-editor-ui' }, ui.toolbar, ui.panel, bar, ui.toast);
   document.body.append(root);
   document.body.classList.add('ap-editing');
+}
+
+/* ----- Form editor for the JSON lists ----- */
+async function openData() {
+  try {
+    if (!dataDoc) {
+      dataDoc = JSON.parse(await readRaw(dataCfg.file));
+      dataBase = JSON.stringify(dataDoc);
+    }
+  } catch (e) { return toast(e.message, 'err'); }
+
+  const draft = JSON.parse(JSON.stringify(dataDoc[dataCfg.key] || []));
+  const list = h('div', { class: 'ap-items' });
+  const modal = h('div', { id: 'ap-modal' });
+
+  function render() {
+    list.replaceChildren();
+    draft.forEach((item, i) => {
+      const box = h('details', { class: 'ap-item' });
+      if (!item._open && draft.length > 3) box.open = false; else box.open = true;
+      box.addEventListener('toggle', () => { item._open = box.open; });
+      const sum = h('summary', {}, dataCfg.summary(item) || '(nouveau)');
+      box.append(sum);
+      dataCfg.fields.forEach(f => {
+        let input;
+        if (f.type === 'textarea') input = h('textarea', { rows: '4' });
+        else if (f.type === 'select') {
+          input = h('select', {});
+          f.options.forEach(o => input.append(h('option', { value: o }, o || '— aucun —')));
+        } else input = h('input', { type: f.type });
+        input.value = item[f.name] || '';
+        input.addEventListener('input', () => { item[f.name] = input.value; sum.textContent = dataCfg.summary(item) || '(nouveau)'; });
+        box.append(h('label', {}, h('span', {}, f.label), input, f.hint ? h('small', {}, f.hint) : ''));
+      });
+      const move = d => () => { const j = i + d; if (j < 0 || j >= draft.length) return; [draft[i], draft[j]] = [draft[j], draft[i]]; render(); };
+      box.append(h('div', { class: 'ap-item-actions' },
+        h('button', { type: 'button', onclick: move(-1) }, '↑ Monter'),
+        h('button', { type: 'button', onclick: move(1) }, '↓ Descendre'),
+        h('button', { type: 'button', class: 'ap-danger', onclick: () => {
+          if (confirm('Supprimer cet élément ?')) { draft.splice(i, 1); render(); }
+        } }, 'Supprimer')));
+      list.append(box);
+    });
+  }
+
+  function apply() {
+    for (const it of draft) {
+      if (it.registration && !safeHref(it.registration)) {
+        return toast("Lien d'inscription non valide : commencez par https://, http:// ou mailto:", 'err');
+      }
+    }
+    dataDoc[dataCfg.key] = draft.map(it => {
+      const clean = {};
+      dataCfg.fields.forEach(f => { clean[f.name] = (it[f.name] || '').trim(); });
+      return clean;
+    });
+    modal.remove();
+    markDirty();
+  }
+
+  render();
+  const add = h('button', { type: 'button', onclick: () => {
+    const it = {}; dataCfg.fields.forEach(f => { it[f.name] = ''; });
+    if (dataCfg.key === 'events') it.format = 'En ligne (visio)';
+    draft.unshift(it); render();
+  } }, '+ Ajouter');
+  modal.append(h('div', { class: 'ap-modal-card' },
+    h('h2', {}, dataCfg.title),
+    h('div', { class: 'ap-modal-top' }, add),
+    list,
+    h('div', { class: 'ap-modal-foot' },
+      h('button', { type: 'button', onclick: () => modal.remove() }, 'Annuler'),
+      h('button', { type: 'button', class: 'ap-primary', onclick: apply }, 'Appliquer'))));
+  document.getElementById('ap-editor-ui').append(modal);
 }
 
 function quit() {
