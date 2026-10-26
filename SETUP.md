@@ -3,7 +3,7 @@
 ## Ce que vous avez
 
 Un site statique HTML/CSS complet avec :
-- 16 pages HTML
+- Une page unique (`index.html`) : texte principal, « Qui suis-je ? » (masquable), « Me contacter »
 - Éditeur visuel (`/admin`) : Anne clique sur les textes et photos du site pour les modifier
 - Hébergement Vercel (gratuit)
 
@@ -69,7 +69,7 @@ Puis faites un `git commit` + `git push`.
 1. Créez un compte gratuit sur [formspree.io](https://formspree.io)
 2. Créez un nouveau formulaire
 3. Copiez l'ID du formulaire (ex: `xpzgkyvw`)
-4. Dans `contact.html`, remplacez `YOUR_FORMSPREE_ID` par cet ID :
+4. Dans `index.html`, remplacez l'ID du formulaire (`mwvykjvp`) par le vôtre :
 
 ```html
 <form ... action="https://formspree.io/f/xpzgkyvw" ...>
@@ -85,10 +85,11 @@ Dans Vercel (Settings > Domains), ajoutez `anne-partridge.com` et suivez les ins
 
 ## Comment Anne édite son site
 
-1. Elle va sur `https://votre-domaine.vercel.app/admin`
-2. Elle choisit une page ; à la première fois, elle clique **Se connecter avec GitHub** (compte GitHub requis)
-3. Elle clique sur un texte ou une photo pour le modifier (bouton « Couleurs » pour le style, « Modifier les dates / témoignages » sur ces deux pages)
-4. Après avoir cliqué sur **Publier**, le site se met à jour automatiquement en ~1 minute
+1. Elle va sur `https://votre-domaine.vercel.app/admin` puis clique **Modifier le site**
+2. À la première fois, elle clique **Se connecter avec GitHub** (compte GitHub requis)
+3. Elle clique sur un texte ou une photo pour le modifier. Boutons de la barre du bas : **Couleurs**, **Afficher / Masquer « Qui suis-je ? »**, **Publier**
+4. Pour ajouter LinkedIn : cliquer sur le lien « LinkedIn » (grisé en mode édition) puis « Adresse du lien »
+5. Après **Publier**, le site se met à jour automatiquement en ~1 minute
 
 > **Note** : Anne a besoin d'un compte GitHub et d'y être invitée comme collaboratrice du dépôt.
 > Dans GitHub : Settings > Collaborators > Add people → entrez son nom d'utilisateur.
@@ -99,33 +100,15 @@ Dans Vercel (Settings > Domains), ajoutez `anne-partridge.com` et suivez les ins
 
 ```
 anne-partridge/
-├── index.html                    ← Page d'accueil
-├── qui-suis-je.html
-├── tarifs.html
-├── prochaines-dates.html         ← Chargé depuis content/prochaines-dates.json
-├── temoignages.html              ← Chargé depuis content/temoignages.json
-├── contact.html
-├── parlerpourquelesenfants.html
-├── freres-soeurs.html
-├── atelier-enseignants.html
-├── seances-individuelles.html
-├── interventions.html
-├── maieusthesie.html
-├── bibliographie.html
-├── conte-des-blipoux.html
-├── english-workshop.html
-├── formation.html
-├── css/style.css                 ← Tous les styles
-├── js/main.js                    ← Navigation + chargement JSON
-├── partials/
-│   ├── nav.html                  ← Navigation partagée
-│   └── footer.html               ← Pied de page partagé
-├── content/
-│   ├── prochaines-dates.json     ← Éditable via /admin
-│   └── temoignages.json          ← Éditable via /admin
-├── admin/
-│   └── index.html                ← Page d'entrée de l'éditeur visuel (js/editor.js)
-├── api/
-│   └── auth.js                   ← Authentification GitHub OAuth
-└── vercel.json                   ← Configuration Vercel
+├── index.html                    ← Le site (une seule page)
+├── css/
+│   ├── style.css                 ← Styles (variables de couleurs en tête, éditables via l'éditeur)
+│   └── editor.css                ← Styles de l'éditeur (chargé en mode édition uniquement)
+├── js/
+│   ├── main.js                   ← Formulaire de contact + chargement de l'éditeur
+│   └── editor.js                 ← Éditeur visuel (publication par commit GitHub)
+├── img/                          ← Photos (les envois de l'éditeur vont dans img/uploads/)
+├── admin/index.html              ← Page d'entrée de l'éditeur
+├── api/auth.js                   ← Authentification GitHub OAuth
+└── vercel.json                   ← En-têtes de sécurité
 ```
