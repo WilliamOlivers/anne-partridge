@@ -5,20 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow">
   <title>Modifier le site — Anne Partridge</title>
+  <link rel="icon" type="image/avif" href="/img/LOGO.avif">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <section class="section">
-    <div class="container prose">
-      <h1>Modifier le site</h1>
-      <p style="margin:1rem 0 1.5rem">
-        Vous pourrez cliquer directement sur les textes et les photos pour les modifier, changer les couleurs,
-        afficher ou masquer la rubrique « Qui suis-je ? », puis cliquer sur « Publier ».
-        Une connexion avec votre compte GitHub vous sera demandée.
-        Le site est mis à jour environ une minute après la publication.
-      </p>
-      <a class="btn" href="/?edit">Modifier le site</a>
-    </div>
-  </section>
+<body class="admin">
+  <main class="admin-card">
+    <img class="admin-logo" src="/img/LOGO.avif" alt="Anne Partridge" width="234" height="240">
+    <h1>Modifier le site</h1>
+    <p>
+      Cliquez sur un texte ou une photo pour le modifier, changez les couleurs, affichez ou masquez
+      «&nbsp;Qui&nbsp;suis-je&nbsp;?&nbsp;», puis publiez. Le site est mis à jour environ une minute plus tard.
+    </p>
+    <a class="btn" href="/?edit">Modifier le site</a>
+    <p class="admin-note"><a href="/">Voir le site sans modifier</a></p>
+  </main>
 </body>
 </html>

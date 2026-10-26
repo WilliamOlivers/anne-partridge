@@ -1,0 +1,20 @@
+/* Admin entry page (/admin) */
+body.admin {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  background: var(--bg-alt);
+}
+.admin-card {
+  width: 100%; max-width: 440px;
+  padding: 2.5rem 2rem;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.admin-logo { width: 84px; height: auto; margin: 0 auto 1.5rem; border-radius: 8px; }
+.admin-card h1 { font-size: 1.9rem; font-weight: 600; letter-spacing: 0; margin-bottom: 1rem; }
+.admin-card p { color: var(--text-light); font-size: 1rem; margin-bottom: 1.75rem; }
+.admin-card .btn { width: 100%; text-align: center; }
+.admin-note { margin: 1.25rem 0 0; font-size: .9rem; }
+.admin-note a { color: var(--text-light); }

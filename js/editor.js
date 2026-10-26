@@ -12,7 +12,7 @@ const TOKEN_KEY = 'ap_token';
 const EDIT_KEY  = 'ap_edit';
 
 // Editable text blocks (leaf-most match wins) and zones that are never editable
-const TEXT_SEL = 'h1,h2,h3,h4,h5,p,li,blockquote,figcaption,a.brand,a.btn,.site-nav a,.contact-links a';
+const TEXT_SEL = 'h1,h2,h3,h4,h5,p,li,blockquote,figcaption,a.btn,.site-nav a,.contact-links a';
 const SKIP_SEL = '#ap-login,#ap-editor-ui';
 
 const COLORS = [
